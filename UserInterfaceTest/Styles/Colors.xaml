@@ -1,0 +1,42 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Color for toolbar each window -->
+    <Color x:Key="BackgroundHeader">#FFFFFF</Color>
+    <SolidColorBrush x:Key="BackgroundHeaderBrush" Color="{StaticResource BackgroundHeader}"/>
+
+    <!-- Color for content container each window -->
+    <Color x:Key="BackgroundLight">#F8F8FB</Color>
+    <SolidColorBrush x:Key="BackgroundLightBrush" Color="{StaticResource BackgroundLight}"/>
+    
+    <Color x:Key="BackgroundDark">#373B53</Color>
+    <SolidColorBrush x:Key="BackgroundDarkBrush" Color="{StaticResource BackgroundDark}"/>
+
+    <!-- Color for all buttons -->
+    <Color x:Key="BackgroundButton">#6F52ED</Color>
+    <SolidColorBrush x:Key="BackgroundButtonBrush" Color="{StaticResource BackgroundButton}"/>
+
+    <!-- Color for borders of control elements (Button, TextBox) -->
+    <Color x:Key="Borders">#373B53</Color>
+    <SolidColorBrush x:Key="BordersBrush" Color="{StaticResource Borders}"/>
+
+    <!-- Light text color (White) -->
+    <Color x:Key="ForegroundLight">#FFFFFF</Color>
+    <SolidColorBrush x:Key="ForegroundWhiteBrush" Color="{StaticResource ForegroundLight}"/>
+
+    <!-- Dark text color (Black) -->
+    <Color x:Key="ForegroundDark">#000000</Color>
+    <SolidColorBrush x:Key="ForegroundBlackBrush" Color="{StaticResource ForegroundDark}"/>
+
+    <!-- General color -->
+    <SolidColorBrush x:Key="GeneralBrush" Color="#493AFC" />
+    <Color x:Key="GeneralColor">#493AFC</Color>
+
+    <!-- For ComboBox style -->
+    <SolidColorBrush x:Key="ComboBoxNormalBorderBrush" Color="#e3e9ef" />
+    <SolidColorBrush x:Key="ComboBoxNormalBackgroundBrush" Color="#ffffff" />
+    <SolidColorBrush x:Key="ComboBoxDisabledForegroundBrush" Color="#888888" />
+    <SolidColorBrush x:Key="ComboBoxDisabledBackgroundBrush" Color="#eeeeee" />
+    <SolidColorBrush x:Key="ComboBoxDisabledBorderBrush" Color="#888888" />
+
+</ResourceDictionary>

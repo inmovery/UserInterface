@@ -1,0 +1,26 @@
+﻿<UserControl
+    x:Class="UserInterfaceTest.Views.ImageDownloaderView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:local="clr-namespace:UserInterfaceTest.Views"
+    d:DesignHeight="300"
+    d:DesignWidth="300"
+    mc:Ignorable="d">
+    <DockPanel LastChildFill="True">
+        <StackPanel DockPanel.Dock="Bottom">
+            <TextBox Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}" />
+            <Button
+                Command="{Binding StartDownloadCommand}"
+                Content="Старт" />
+            <Button
+                Command="{Binding StopDownloadCommand}"
+                Content="Стоп" />
+        </StackPanel>
+        <Border Style="{StaticResource ImageBOrderStyle}">
+            <Image Source="{Binding SourceImage}" />
+        </Border>
+
+    </DockPanel>
+</UserControl>

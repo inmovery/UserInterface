@@ -1,0 +1,153 @@
+﻿<Window x:Class="UserInterfaceTest.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UserInterfaceTest.Views"
+        xmlns:converters="clr-namespace:UserInterfaceTest.Converters"
+        xmlns:vm="clr-namespace:UserInterfaceTest.ViewModels"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Title="MainWindow"
+        Width="1280"
+        Height="720"
+        MinWidth="1280"
+        MinHeight="720"
+        mc:Ignorable="d">
+    <Window.Resources>
+        <converters:ProgressConverter x:Key="ProgressConverter" />
+
+        <Style TargetType="{x:Type local:MainWindow}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Window}">
+                        <!-- Outer border with the dropshadow margin -->
+                        <Border Padding="{Binding OuterMarginSizeThickness, FallbackValue=5}">
+                            <!-- Main window outline -->
+                            <Grid>
+
+                                <!-- Opacity mask for corners on grid -->
+                                <Border
+                                    x:Name="Container"
+                                    Background="{StaticResource BackgroundLightBrush}"
+                                    CornerRadius="{Binding WindowCornerRadius, FallbackValue=0}" />
+
+                                <!-- Window border and dropshadow -->
+                                <Border CornerRadius="{Binding WindowCornerRadius, FallbackValue=0}"
+                                        Background="{Binding ForegroundLightBrush, FallbackValue=White}">
+                                    <Border.Effect>
+                                        <DropShadowEffect ShadowDepth="0" Opacity="0.2" />
+                                    </Border.Effect>
+                                </Border>
+
+                                <!-- The main window content -->
+                                <Grid>
+
+                                    <!-- Corner clipping -->
+                                    <Grid.OpacityMask>
+                                        <VisualBrush Visual="{Binding ElementName=Container}" />
+                                    </Grid.OpacityMask>
+
+                                    <Grid.RowDefinitions>
+                                        <!-- Title bar -->
+                                        <RowDefinition Height="{Binding TitleHeightGridLength, FallbackValue=35}" />
+                                        <!-- Drop shadow -->
+                                        <RowDefinition Height="Auto" />
+                                        <!-- Window Content -->
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Title bar -->
+                                    <Grid Grid.Row="0" Panel.ZIndex="1">
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <!-- Title -->
+                                            <ColumnDefinition Width="*" />
+                                            <!-- Window buttons -->
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Title -->
+                                        <Button Grid.Column="0" Style="{StaticResource Hoverless}" Command="{Binding MenuCommand}">
+                                            <TextBlock Style="{StaticResource HeaderText}" Text="Image Downloader" Width="Auto"/>
+                                        </Button>
+
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                            <!-- Windows button -->
+                                            <Button Command="{Binding MinimizeCommand}" Padding="10 15 10 0" Style="{StaticResource WindowControlButton}">
+                                                <ContentControl Content="{StaticResource IconMinimize}" />
+                                            </Button>
+                                            <Button Command="{Binding MaximizeCommand}" Padding="10 4 10 0" Style="{StaticResource WindowControlButton}">
+                                                <ContentControl Content="{StaticResource IconMaximize}" />
+                                            </Button>
+                                            <Button Command="{Binding CloseCommand}" Style="{StaticResource WindowCloseButton}">
+                                                <ContentControl Content="{StaticResource IconExit}" />
+                                            </Button>
+                                        </StackPanel>
+
+                                    </Grid>
+
+                                    <!-- Drop shadow -->
+                                    <Border Grid.Row="1" Height="6" BorderThickness="0 1 0 0">
+
+                                        <Border.BorderBrush>
+                                            <SolidColorBrush Color="Black" Opacity="0.05" />
+                                        </Border.BorderBrush>
+
+                                    </Border>
+
+                                    <!-- Page Content -->
+                                    <Border Grid.Row="2" Padding="{Binding InnerContentPadding}">
+                                        <ContentPresenter Content="{TemplateBinding Content}" />
+                                    </Border>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome
+            ResizeBorderThickness="{Binding ResizeBorderThickness}"
+            CaptionHeight="{Binding TitleHeight}"
+            CornerRadius="0"
+            GlassFrameThickness="0"/>
+    </WindowChrome.WindowChrome>
+
+    <DockPanel
+        Margin="10"
+        LastChildFill="True">
+        <StackPanel DockPanel.Dock="Bottom">
+            <Button
+                Command="{Binding DownloadAllCommand}"
+                Content="Загрузить все" />
+            <ProgressBar Value="{Binding TotalDownloadingProgress, Mode=OneWay}" />
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Статус загрузки: " />
+                <TextBlock Text="{Binding TotalDownloadingProgress, Mode=OneWay}" /><!-- , Converter={StaticResource ProgressConverter} -->
+            </StackPanel>
+        </StackPanel>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <local:ImageDownloaderView
+                Grid.Column="0"
+                DataContext="{Binding FirstImageDownloaderViewModel}" />
+            <local:ImageDownloaderView
+                Grid.Column="1"
+                DataContext="{Binding SecondImageDownloaderViewModel}" />
+            <local:ImageDownloaderView
+                Grid.Column="2"
+                DataContext="{Binding ThirdImageDownloaderViewModel}" />
+        </Grid>
+        
+    </DockPanel>
+</Window>
