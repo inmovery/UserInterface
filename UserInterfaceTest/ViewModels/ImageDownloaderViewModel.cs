@@ -24,6 +24,8 @@ namespace UserInterfaceTest.ViewModels
         private ICommand startDownloadCommand;
         private ICommand stopDownloadCommand;
 
+        private bool isDownloading;
+
         #endregion Private Members
 
         #region Public Members [INPC]
@@ -80,8 +82,20 @@ namespace UserInterfaceTest.ViewModels
             }
         }
 
-        #endregion Public Members [INPC]
+        public bool IsDownloading
+        {
+            get
+            {
+                return isDownloading;
+            }
+            set
+            {
+                isDownloading = value;
+                RaisePropertyChanged();
+            }
+        }
 
+        #endregion Public Members [INPC]
 
         #region Commands
 
@@ -90,7 +104,7 @@ namespace UserInterfaceTest.ViewModels
             get
             {
                 if (startDownloadCommand == null)
-                    startDownloadCommand = new AsyncRelayCommand(StartDownloadAsync, () => DownloadingState != DownloadingState.Downloading && !string.IsNullOrEmpty(Url));
+                    startDownloadCommand = new AsyncRelayCommand(() => StartDownloadAsync("Default"), () => DownloadingState != DownloadingState.Downloading && !string.IsNullOrEmpty(Url));
                 return startDownloadCommand;
             }
         }
@@ -109,11 +123,13 @@ namespace UserInterfaceTest.ViewModels
 
         #region Methods
 
-        public async Task StartDownloadAsync()
+        public async Task StartDownloadAsync(string setting)
         {
             try
             {
-                DownloadingState = DownloadingState.Downloading;
+                if(setting != "All")
+                    DownloadingState = DownloadingState.Downloading;
+                IsDownloading = true;
                 SourceImage = null;
                 var dataBytes = await fileDownloader.Download(Url, progress => DownloadingProgress = progress);
                 if (dataBytes.Length != 0)
@@ -133,15 +149,17 @@ namespace UserInterfaceTest.ViewModels
             }
             finally
             {
-                DownloadingState = DownloadingState.Idle;
+                IsDownloading = false;
+                if (setting != "All")
+                    DownloadingState = DownloadingState.Completed;
             }
         }
 
         public void StopDownload()
         {
+            fileDownloader.CancelDownload();
             DownloadingState = DownloadingState.Paused;
             DownloadingProgress = 0.0;
-            fileDownloader.CancelDownload();
         }
 
         public void ClearState()

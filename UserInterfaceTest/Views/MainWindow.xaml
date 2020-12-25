@@ -126,10 +126,10 @@
             <Button
                 Command="{Binding DownloadAllCommand}"
                 Content="Загрузить все" />
-            <ProgressBar Value="{Binding TotalDownloadingProgress, Mode=OneWay}" />
+            <ProgressBar Value="{Binding TotalDownloadingProgress.TotalDownloadingProgressValue, Mode=OneWay}" />
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Статус загрузки: " />
-                <TextBlock Text="{Binding TotalDownloadingProgress, Mode=OneWay}" /><!-- , Converter={StaticResource ProgressConverter} -->
+                <TextBlock Text="{Binding TotalDownloadingProgress.TotalDownloadingProgressValue, Mode=OneWay}" /><!-- Converter={StaticResource ProgressConverter} -->
             </StackPanel>
         </StackPanel>
         <Grid>

@@ -2,11 +2,13 @@
 using System.ComponentModel;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using UserInterfaceTest.Commands;
 using UserInterfaceTest.Enums;
+using UserInterfaceTest.Models;
 
 namespace UserInterfaceTest.ViewModels
 {
@@ -19,7 +21,7 @@ namespace UserInterfaceTest.ViewModels
         private ImageDownloaderViewModel secondImageDownloaderViewModel;
         private ImageDownloaderViewModel thirdImageDownloaderViewModel;
 
-        private double totalDownloadingProgress;
+        private TotalDownloadingProgress totalDownloadingProgress;
         private int countActiveDownloading;
 
         private ICommand downloadAllCommand;
@@ -82,12 +84,16 @@ namespace UserInterfaceTest.ViewModels
             }
         }
 
-        public double TotalDownloadingProgress
+        public TotalDownloadingProgress TotalDownloadingProgress
         {
             get
             {
-                return (FirstImageDownloaderViewModel.DownloadingProgress + SecondImageDownloaderViewModel.DownloadingProgress
-                            + ThirdImageDownloaderViewModel.DownloadingProgress) / (CountActiveDownloading != 0 ? CountActiveDownloading : 1);
+                return totalDownloadingProgress;
+            }
+            set
+            {
+                totalDownloadingProgress = value;
+                RaisePropertyChanged();
             }
         }
 
@@ -246,12 +252,43 @@ namespace UserInterfaceTest.ViewModels
         public async Task DownloadAllAsync()
         {
             CountActiveDownloading = 0;
-            
+
+            FirstImageDownloaderViewModel.DownloadingState = DownloadingState.Downloading;
+            SecondImageDownloaderViewModel.DownloadingState = DownloadingState.Downloading;
+            ThirdImageDownloaderViewModel.DownloadingState = DownloadingState.Downloading;
+
             await Task.WhenAll(
-                FirstImageDownloaderViewModel.StartDownloadAsync(),
-                SecondImageDownloaderViewModel.StartDownloadAsync(),
-                ThirdImageDownloaderViewModel.StartDownloadAsync()
+                FirstImageDownloaderViewModel.StartDownloadAsync("All"),
+                SecondImageDownloaderViewModel.StartDownloadAsync("All"),
+                ThirdImageDownloaderViewModel.StartDownloadAsync("All")
             );
+
+            FirstImageDownloaderViewModel.DownloadingState = DownloadingState.Completed;
+            SecondImageDownloaderViewModel.DownloadingState = DownloadingState.Completed;
+            ThirdImageDownloaderViewModel.DownloadingState = DownloadingState.Completed;
+
+            CountActiveDownloading = 0;
+        }
+
+        /// <summary>
+        /// Clearing ProgressBar values
+        /// </summary>
+        public async void ApplyCompletedState()
+        {
+            CountActiveDownloading = 0;
+            FirstImageDownloaderViewModel.ClearState();
+            SecondImageDownloaderViewModel.ClearState();
+            ThirdImageDownloaderViewModel.ClearState();
+            TotalDownloadingProgress.TotalDownloadingProgressValue = -1;
+        }
+
+        /// <summary>
+        /// Handle closing window and saving data
+        /// </summary>
+        private void CloseWindow()
+        {
+            // TODO: implement this like smth else
+            windowInstance.Close();
         }
 
         #endregion
@@ -287,6 +324,8 @@ namespace UserInterfaceTest.ViewModels
             ThirdImageDownloaderViewModel.PropertyChanged += ImageDownloader_PropertyChanged;
 
             CountActiveDownloading = 0;
+            TotalDownloadingProgress = new TotalDownloadingProgress();
+            TotalDownloadingProgress.PropertyChanged += TotalDownloadingProgress_PropertyChanged;
         }
 
         public MainViewModel(ImageDownloaderViewModel first, ImageDownloaderViewModel second, ImageDownloaderViewModel third)
@@ -294,15 +333,22 @@ namespace UserInterfaceTest.ViewModels
             FirstImageDownloaderViewModel = first;
             SecondImageDownloaderViewModel = second;
             ThirdImageDownloaderViewModel = third;
+
+            CountActiveDownloading = 0;
+            TotalDownloadingProgress = new TotalDownloadingProgress();
         }
 
         #endregion Constructors
+
+        #region PropertyChange Methods
 
         private void ImageDownloader_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
                 case "DownloadingProgress":
+                    TotalDownloadingProgress.TotalDownloadingProgressValue = (FirstImageDownloaderViewModel.DownloadingProgress + SecondImageDownloaderViewModel.DownloadingProgress
+                            + ThirdImageDownloaderViewModel.DownloadingProgress) / (CountActiveDownloading != 0 ? CountActiveDownloading : 1);
                     RaisePropertyChanged(nameof(TotalDownloadingProgress));
                     break;
                 case "DownloadingState":
@@ -310,7 +356,7 @@ namespace UserInterfaceTest.ViewModels
                     {
                         CountActiveDownloading++;
                     }
-                    else
+                    else if(((ImageDownloaderViewModel)sender).DownloadingState == DownloadingState.Completed)
                     {
                         CountActiveDownloading--;
                     }
@@ -319,14 +365,18 @@ namespace UserInterfaceTest.ViewModels
             }
         }
 
-        /// <summary>
-        /// Handle closing window and saving data
-        /// </summary>
-        private void CloseWindow()
+        private async void TotalDownloadingProgress_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            // TODO: implement this like smth else
-            windowInstance.Close();
+            if (e.PropertyName == "TotalDownloadingProgressValue")
+            {
+                if (Math.Abs(((TotalDownloadingProgress)sender).TotalDownloadingProgressValue - 100.0) < 0.1)
+                {
+                    await Task.Run(ApplyCompletedState);
+                }
+            }
         }
+
+        #endregion PropertyChange Methods
 
     }
 }
