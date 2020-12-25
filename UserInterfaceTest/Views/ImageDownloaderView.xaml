@@ -3,24 +3,71 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:converters="clr-namespace:UserInterfaceTest.Converters"
     xmlns:local="clr-namespace:UserInterfaceTest.Views"
     d:DesignHeight="300"
     d:DesignWidth="300"
     mc:Ignorable="d">
+
     <DockPanel LastChildFill="True">
         <StackPanel DockPanel.Dock="Bottom">
-            <TextBox Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox
+                Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}"
+                Height="40"
+                Margin="5"
+                FontSize="20"
+                FontFamily="{StaticResource MontserratMedium}"
+                Style="{StaticResource CustomTextBox}"/>
             <Button
                 Command="{Binding StartDownloadCommand}"
-                Content="Старт" />
+                Content="Старт"
+                Margin="5"
+                Background="#00db6a"
+                Style="{StaticResource RegularButton}"/>
             <Button
                 Command="{Binding StopDownloadCommand}"
-                Content="Стоп" />
+                Margin="5"
+                Content="Стоп"
+                Background="#d1284c"
+                Style="{StaticResource RegularButton}"/>
         </StackPanel>
-        <Border Style="{StaticResource ImageBOrderStyle}">
-            <Image Source="{Binding SourceImage}" />
+
+        <Border
+            MinWidth="300"
+            MinHeight="150"
+            Margin="5"
+            CornerRadius="3"
+            BorderThickness="3">
+            <Border.BorderBrush>
+                <VisualBrush>
+                    <VisualBrush.Visual>
+                        <Rectangle
+                            StrokeDashArray="4 3"
+                            Stroke="Gray"
+                            StrokeThickness="2"
+                            Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualWidth}"
+                            Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualHeight}"/>
+                    </VisualBrush.Visual>
+                </VisualBrush>
+            </Border.BorderBrush>
+            <StackPanel
+                Orientation="Vertical"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+                <!-- TODO: add converter -->
+                <!--<TextBlock
+                    Text="Preview"
+                    Foreground="#BDBDBD"
+                    FontSize="20" />
+                <ContentControl
+                    Content="{StaticResource IconFileUpload}"
+                    Width="48"
+                    Height="74" />-->
+                <Image Source="{Binding SourceImage}" />
+            </StackPanel>
         </Border>
+
 
     </DockPanel>
 </UserControl>

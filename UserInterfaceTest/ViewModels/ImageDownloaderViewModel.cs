@@ -129,7 +129,6 @@ namespace UserInterfaceTest.ViewModels
             {
                 if(setting != "All")
                     DownloadingState = DownloadingState.Downloading;
-                IsDownloading = true;
                 SourceImage = null;
                 var dataBytes = await fileDownloader.Download(Url, progress => DownloadingProgress = progress);
                 if (dataBytes.Length != 0)
@@ -149,7 +148,6 @@ namespace UserInterfaceTest.ViewModels
             }
             finally
             {
-                IsDownloading = false;
                 if (setting != "All")
                     DownloadingState = DownloadingState.Completed;
             }

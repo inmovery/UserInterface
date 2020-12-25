@@ -1,231 +1,210 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:System.Windows.Controls">
 
-    <Style
-        x:Key="ImageBOrderStyle"
-        TargetType="Border">
-        <Setter Property="Margin" Value="5" />
-        <Setter Property="BorderBrush" Value="Black" />
-        <Setter Property="BorderThickness" Value=".5" />
-    </Style>
-
-    <Style TargetType="ProgressBar">
-        <Setter Property="Margin" Value="5" />
-        <Setter Property="Height" Value="30" />
-    </Style>
-
-    <Style TargetType="TextBox">
-        <Setter Property="Padding" Value="5" />
-        <Setter Property="Margin" Value="5" />
-    </Style>
-
-    <Style TargetType="TextBlock">
-        <Setter Property="Padding" Value="5" />
-        <Setter Property="Margin" Value="5" />
-        <Setter Property="FontSize" Value="16" />
-    </Style>
-
-    <Style TargetType="Button">
-        <Setter Property="Padding" Value="5" />
-        <Setter Property="Margin" Value="5" />
-    </Style>
-
-    <Style TargetType="Image">
-        <Setter Property="Margin" Value="5" />
-    </Style>
     
-    
-
-    <!-- Toggle button -->
-    <ControlTemplate TargetType="ToggleButton" x:Key="ComboBoxToggleButtonTemplate">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="35" />
-            </Grid.ColumnDefinitions>
-            <Border
-                x:Name="Border"
-                Grid.ColumnSpan="2"
-                BorderBrush="{StaticResource ComboBoxNormalBorderBrush}"
-                CornerRadius="3"
-                BorderThickness="1"
-                Background="{StaticResource ComboBoxNormalBackgroundBrush}" />
-            <Border
-                x:Name="ButtonBorder"
-                Grid.Column="1"
-                Margin="1"
-                BorderBrush="#444444"
-                CornerRadius="3"
-                Background="{StaticResource ComboBoxNormalBackgroundBrush}" />
-            <Path
-                x:Name="Arrow"
-                Grid.Column="1"
-                Margin="0 0 0 5"
-                StrokeThickness="3"
-                Stroke="#000000"
-                StrokeLineJoin="Round"
-                StrokeStartLineCap="Round"
-                StrokeEndLineCap="Round"
-                Data="M6 9L12 15L18 9"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center" />
-        </Grid>
-        <ControlTemplate.Triggers>
-            <Trigger Property="UIElement.IsMouseOver" Value="True">
-                <Setter Property="Panel.Background" TargetName="ButtonBorder" Value="WhiteSmoke"/>
-            </Trigger>
-            <Trigger Property="ToggleButton.IsChecked" Value="True">
-                <Setter Property="Panel.Background" TargetName="ButtonBorder" Value="WhiteSmoke"/>
-                <Setter Property="Shape.Fill" TargetName="Arrow" Value="#FF8D979E" />
-            </Trigger>
-
-            <Trigger Property="UIElement.IsEnabled" Value="False">
-                <Setter Property="Panel.Background" TargetName="Border" Value="{StaticResource ComboBoxDisabledBackgroundBrush}" />
-                <Setter Property="Panel.Background" TargetName="ButtonBorder" Value="{StaticResource ComboBoxDisabledBackgroundBrush}"/>
-                <Setter Property="Border.BorderBrush" TargetName="ButtonBorder" Value="{StaticResource ComboBoxDisabledBorderBrush}"/>
-                <Setter Property="TextElement.Foreground" Value="{StaticResource ComboBoxDisabledForegroundBrush}" />
-                <Setter Property="Shape.Fill" TargetName="Arrow" Value="#999" />
-
-            </Trigger>
-
-        </ControlTemplate.Triggers>
-    </ControlTemplate>
-
-    <!-- Custom combobox -->
-    <Style x:Key="CustomComboBox"  TargetType="{x:Type ComboBox}">
-        <Setter Property="UIElement.SnapsToDevicePixels" Value="True" />
-        <Setter Property="FrameworkElement.OverridesDefaultStyle" Value="True" />
-        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
-        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
-        <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
-        <Setter Property="TextElement.Foreground" Value="Black" />
-        <Setter Property="FrameworkElement.FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="BorderBrush" Value="{StaticResource GeneralBrush}" />
-        <Setter Property="BorderThickness" Value="1.5" />
-        <Setter Property="Control.Template">
+    <!-- TextBox -->
+    <Style TargetType="TextBox" x:Key="CustomTextBox">
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="#d9d9db" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="ComboBox">
-                    <Grid>
-                        <ToggleButton
-                            x:Name="CustomToggleButton"
-                            Cursor="Hand"
-                            ClickMode="Press"
-                            Focusable="False"
+                <ControlTemplate TargetType="TextBox">
+                    <Grid
+                        x:Name="root"
+                        Height="{TemplateBinding Height}"
+                        Width="{TemplateBinding Width}"
+                        SnapsToDevicePixels="true">
+                        <Border
+                            x:Name="TextBoxBorder"
+                            CornerRadius="3"
+                            Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            IsChecked="{Binding Path=IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                            Template="{StaticResource ComboBoxToggleButtonTemplate}" />
-
-                        <ContentPresenter
-                            x:Name="ContentSite"
-                            Margin="5 3 23 3"
-                            IsHitTestVisible="False"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            Content="{TemplateBinding ComboBox.SelectionBoxItem}"
-                            ContentTemplate="{TemplateBinding ComboBox.SelectionBoxItemTemplate}"
-                            ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" />
-                        <TextBox
-                            x:Name="PART_EditableTextBox"
-                            Margin="3 3 23 3"
-                            IsReadOnly="{TemplateBinding IsReadOnly}"
-                            Visibility="Hidden"
-                            Background="Transparent"
-                            HorizontalAlignment="Left"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            VerticalAlignment="Center"
-                            Focusable="True">
-                            <TextBox.Template>
-                                <ControlTemplate TargetType="TextBox">
-                                    <Border
-                                        x:Name="PART_ContentHost"
-                                        Focusable="True" />
-                                </ControlTemplate>
-                            </TextBox.Template>
-                        </TextBox>
-
-                        <!--Popup showing items-->
-                        <Popup
-                            Name="Popup"
-                            Placement="Bottom"
-                            Focusable="False"
-                            AllowsTransparency="True"
-                            IsOpen="{TemplateBinding ComboBox.IsDropDownOpen}"
-                            PopupAnimation="Slide">
-                            <Grid
-                                Name="DropDown"
-                                SnapsToDevicePixels="True"
-                                MinWidth="{TemplateBinding FrameworkElement.ActualWidth}"
-                                MaxHeight="{TemplateBinding ComboBox.MaxDropDownHeight}">
-                                <Border
-                                    x:Name="DropDownBorder"
-                                    Background="White"
-                                    Margin="0 1 0 0"
-                                    CornerRadius="3"
-                                    BorderThickness="1"
-                                    BorderBrush="{StaticResource ComboBoxNormalBorderBrush}" />
-                                <ScrollViewer Margin="4 6 4 6" SnapsToDevicePixels="True">
-                                    <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
-                                </ScrollViewer>
-                            </Grid>
-                        </Popup>
+                            BorderThickness="{TemplateBinding BorderThickness}"/>
+                        <ScrollViewer
+                            x:Name="PART_ContentHost"
+                            Padding="{TemplateBinding Padding}"
+                            BorderThickness="1"
+                            IsTabStop="False"
+                            Background="{x:Null}"
+                            TextElement.Foreground="{TemplateBinding Foreground}" />
                     </Grid>
                     <ControlTemplate.Triggers>
 
-                        <Trigger Property="ComboBox.IsEnabled" Value="True">
-                            <Setter Property="BorderBrush" TargetName="DropDownBorder" Value="{StaticResource GeneralBrush}" />
-                            <Setter Property="BorderThickness" TargetName="DropDownBorder" Value="1.5" />
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter Property="BorderBrush" TargetName="TextBoxBorder" Value="{StaticResource GeneralBrush}" />
+                            <Setter Property="BorderThickness" TargetName="TextBoxBorder" Value="1.5" />
                         </Trigger>
 
-                        <Trigger Property="ItemsControl.HasItems" Value="False">
-                            <Setter Property="FrameworkElement.MinHeight" TargetName="DropDownBorder" Value="95" />
-                        </Trigger>
-                        <Trigger Property="UIElement.IsEnabled" Value="False">
-                            <Setter Property="TextElement.Foreground" Value="{StaticResource ComboBoxDisabledForegroundBrush}" />
-                        </Trigger>
-                        <Trigger Property="ItemsControl.IsGrouping" Value="True">
-                            <Setter Property="ScrollViewer.CanContentScroll" Value="False" />
-                        </Trigger>
-                        <Trigger Property="ComboBox.IsEditable" Value="True">
-                            <Setter Property="KeyboardNavigation.IsTabStop" Value="False" />
-                            <Setter Property="UIElement.Visibility" TargetName="PART_EditableTextBox" Value="Visible" />
-                            <Setter Property="UIElement.Visibility" TargetName="ContentSite" Value="Hidden" />
-                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <!-- Item of Combobox -->
-    <Style x:Key="CustomComboBoxItem" TargetType="{x:Type ComboBoxItem}">
-        <Setter Property="SnapsToDevicePixels" Value="true" />
-        <Setter Property="HorizontalAlignment" Value="Stretch" />
-        <Setter Property="VerticalAlignment" Value="Stretch" />
-        <Setter Property="FontSize" Value="14" />
-        <Setter Property="OverridesDefaultStyle" Value="true"/>
+    <!-- ProgressBar -->
+    <LinearGradientBrush x:Key="ProgressBarBackground" EndPoint="1,0" StartPoint="0,0">
+        <GradientStop Color="#BABABA" Offset="0"/>
+        <GradientStop Color="#C7C7C7" Offset="0.5"/>
+        <GradientStop Color="#BABABA" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ProgressBarBorderBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="#B2B2B2" Offset="0"/>
+        <GradientStop Color="#8C8C8C" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ProgressBarGlassyHighlight" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="#50FFFFFF" Offset="0.5385"/>
+        <GradientStop Color="#00FFFFFF" Offset="0.5385"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ProgressBarTopHighlight" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="#80FFFFFF" Offset="0.05"/>
+        <GradientStop Color="#00FFFFFF" Offset="0.25"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ProgressBarIndicatorAnimatedFill" EndPoint="1,0" StartPoint="0,0">
+        <GradientStop Color="#00FFFFFF" Offset="0"/>
+        <GradientStop Color="#60FFFFFF" Offset="0.4"/>
+        <GradientStop Color="#60FFFFFF" Offset="0.6"/>
+        <GradientStop Color="#00FFFFFF" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ProgressBarIndicatorDarkEdgeLeft" EndPoint="1,0" StartPoint="0,0">
+        <GradientStop Color="#0C000000" Offset="0"/>
+        <GradientStop Color="#20000000" Offset="0.3"/>
+        <GradientStop Color="#00000000" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ProgressBarIndicatorDarkEdgeRight" EndPoint="1,0" StartPoint="0,0">
+        <GradientStop Color="#00000000" Offset="0"/>
+        <GradientStop Color="#20000000" Offset="0.7"/>
+        <GradientStop Color="#0C000000" Offset="1"/>
+    </LinearGradientBrush>
+    <RadialGradientBrush x:Key="ProgressBarIndicatorLightingEffectLeft" RadiusY="1" RadiusX="1" RelativeTransform="1,0,0,1,0.5,0.5">
+        <GradientStop Color="#60FFFFC4" Offset="0"/>
+        <GradientStop Color="#00FFFFC4" Offset="1"/>
+    </RadialGradientBrush>
+    <LinearGradientBrush x:Key="ProgressBarIndicatorLightingEffect" EndPoint="0,0" StartPoint="0,1">
+        <GradientStop Color="#60FFFFC4" Offset="0"/>
+        <GradientStop Color="#00FFFFC4" Offset="1"/>
+    </LinearGradientBrush>
+    <RadialGradientBrush x:Key="ProgressBarIndicatorLightingEffectRight" RadiusY="1" RadiusX="1" RelativeTransform="1,0,0,1,-0.5,0.5">
+        <GradientStop Color="#60FFFFC4" Offset="0"/>
+        <GradientStop Color="#00FFFFC4" Offset="1"/>
+    </RadialGradientBrush>
+    <LinearGradientBrush x:Key="ProgressBarIndicatorGlassyHighlight" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="#90FFFFFF" Offset="0.5385"/>
+        <GradientStop Color="#00FFFFFF" Offset="0.5385"/>
+    </LinearGradientBrush>
+    <Style x:Key="ProgressBarTestStyle" TargetType="{x:Type ProgressBar}">
+        <Setter Property="Foreground" Value="#FF0699D6"/>
+        <Setter Property="Background" Value="{StaticResource ProgressBarBackground}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource ProgressBarBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="ComboBoxItem">
-                    <Border
-                        Name="Border"
-                        Padding="6"
-                        Margin="0 1 0 0"
-                        BorderThickness="2 0 0 0"
-                        CornerRadius="2"
-                        Background="Transparent"
-                        BorderBrush="Transparent">
-                        <TextBlock TextAlignment="Left">
-                            <ContentPresenter />
-                        </TextBlock>
-                    </Border>
-
+                <ControlTemplate TargetType="{x:Type ProgressBar}">
+                    <Grid x:Name="TemplateRoot" SnapsToDevicePixels="true">
+                        <Rectangle Fill="{TemplateBinding Background}" RadiusY="2" RadiusX="2"/>
+                        <Border Background="{StaticResource ProgressBarGlassyHighlight}" CornerRadius="2" Margin="1"/>
+                        <Border BorderBrush="#80FFFFFF" BorderThickness="1,0,1,1" Background="{StaticResource ProgressBarTopHighlight}" Margin="1"/>
+                        <Rectangle x:Name="PART_Track" Margin="1"/>
+                        <Decorator x:Name="PART_Indicator" HorizontalAlignment="Left" Margin="1">
+                            <Grid x:Name="Foreground" Background="{x:Null}">
+                                <Rectangle x:Name="Indicator" Fill="{TemplateBinding Foreground}"/>
+                                <Grid x:Name="Animation" ClipToBounds="true">
+                                    <Rectangle x:Name="PART_GlowRect" Fill="{StaticResource ProgressBarIndicatorAnimatedFill}" HorizontalAlignment="Left" Margin="-100,0,0,0" Width="100"/>
+                                </Grid>
+                                <Grid x:Name="Overlay">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition MaxWidth="15"/>
+                                        <ColumnDefinition Width="0.1*"/>
+                                        <ColumnDefinition MaxWidth="15"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Rectangle x:Name="LeftDark" Margin="1,1,0,1" RadiusY="1" RadiusX="1" Grid.RowSpan="2">
+                                        <Rectangle.Fill>
+                                            <LinearGradientBrush EndPoint="1,0" StartPoint="0,0">
+                                                <GradientStop Color="#0C000000" Offset="0"/>
+                                                <GradientStop Color="#20000000" Offset="0.3"/>
+                                                <GradientStop Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <Rectangle x:Name="RightDark" Grid.Column="2" Margin="0,1,1,1" RadiusY="1" RadiusX="1" Grid.RowSpan="2">
+                                        <Rectangle.Fill>
+                                            <LinearGradientBrush EndPoint="1,0" StartPoint="0,0">
+                                                <GradientStop Color="#00000000" Offset="0"/>
+                                                <GradientStop Color="#20000000" Offset="0.7"/>
+                                                <GradientStop Color="#0C000000" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <Rectangle x:Name="LeftLight" Grid.Column="0" Grid.Row="2">
+                                        <Rectangle.Fill>
+                                            <RadialGradientBrush RadiusY="1" RadiusX="1" RelativeTransform="1,0,0,1,0.5,0.5">
+                                                <GradientStop Color="#60C4CAFF" Offset="0.006"/>
+                                                <GradientStop Color="#00C4C8FF" Offset="1"/>
+                                            </RadialGradientBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <Rectangle x:Name="CenterLight" Grid.Column="1" Grid.Row="2">
+                                        <Rectangle.Fill>
+                                            <LinearGradientBrush EndPoint="0,0" StartPoint="0,1">
+                                                <GradientStop Color="#60C4C8FF" Offset="0"/>
+                                                <GradientStop Color="#00C4C8FF" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <Rectangle x:Name="RightLight" Grid.Column="2" Grid.Row="2">
+                                        <Rectangle.Fill>
+                                            <RadialGradientBrush RadiusY="1" RadiusX="1" RelativeTransform="1,0,0,1,-0.5,0.5">
+                                                <GradientStop Color="#60C4C8FF" Offset="0"/>
+                                                <GradientStop Color="#00C4C8FF" Offset="1"/>
+                                            </RadialGradientBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <Border x:Name="Highlight1" Grid.ColumnSpan="3" Grid.RowSpan="2">
+                                        <Border.Background>
+                                            <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                                                <GradientStop Color="#90FFFFFF" Offset="0.5385"/>
+                                                <GradientStop Color="#00FFFFFF" Offset="0.5385"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+                                    <Border x:Name="Highlight2" Grid.ColumnSpan="3" Grid.RowSpan="2">
+                                        <Border.Background>
+                                            <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                                                <GradientStop Color="#80FFFFFF" Offset="0.05"/>
+                                                <GradientStop Color="#00FFFFFF" Offset="0.25"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+                                </Grid>
+                            </Grid>
+                        </Decorator>
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2"/>
+                    </Grid>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsHighlighted" Value="true">
-                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource GeneralBrush}"/>
-                            <Setter TargetName="Border" Property="Background" Value="#ccccff"/>
-                            <Setter TargetName="Border" Property="Cursor" Value="Hand" />
+                        <Trigger Property="Orientation" Value="Vertical">
+                            <Setter Property="LayoutTransform" TargetName="TemplateRoot">
+                                <Setter.Value>
+                                    <RotateTransform Angle="-90"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsIndeterminate" Value="true">
+                            <Setter Property="Visibility" TargetName="LeftDark" Value="Collapsed"/>
+                            <Setter Property="Visibility" TargetName="RightDark" Value="Collapsed"/>
+                            <Setter Property="Visibility" TargetName="LeftLight" Value="Collapsed"/>
+                            <Setter Property="Visibility" TargetName="CenterLight" Value="Collapsed"/>
+                            <Setter Property="Visibility" TargetName="RightLight" Value="Collapsed"/>
+                            <Setter Property="Visibility" TargetName="Indicator" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsIndeterminate" Value="false">
+                            <Setter Property="Background" TargetName="Animation" Value="#80B5FFA9"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

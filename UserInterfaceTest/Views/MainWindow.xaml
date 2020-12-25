@@ -125,11 +125,24 @@
         <StackPanel DockPanel.Dock="Bottom">
             <Button
                 Command="{Binding DownloadAllCommand}"
-                Content="Загрузить все" />
-            <ProgressBar Value="{Binding TotalDownloadingProgress.TotalDownloadingProgressValue, Mode=OneWay}" />
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Статус загрузки: " />
-                <TextBlock Text="{Binding TotalDownloadingProgress.TotalDownloadingProgressValue, Mode=OneWay}" /><!-- Converter={StaticResource ProgressConverter} -->
+                Content="Загрузить все"
+                Margin="5"
+                Style="{StaticResource RegularButton}"/>
+            <ProgressBar
+                Value="{Binding TotalDownloadingProgress.TotalDownloadingProgressValue, Mode=OneWay}"
+                Height="30"
+                Margin="5"
+                Foreground="{StaticResource GeneralBrush}"
+                Style="{DynamicResource ProgressBarTestStyle}"/>
+            <StackPanel Orientation="Horizontal" Margin="5 0 0 0">
+                <TextBlock
+                    Text="Статус загрузки: "
+                    FontSize="20"
+                    FontFamily="{StaticResource MontserratMedium}"/>
+                <TextBlock
+                    Text="{Binding TotalDownloadingProgress.TotalDownloadingProgressValue, Mode=OneWay, Converter={StaticResource ProgressConverter}}"
+                    FontSize="20"
+                    FontFamily="{StaticResource MontserratMedium}"/>
             </StackPanel>
         </StackPanel>
         <Grid>
