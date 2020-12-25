@@ -156,7 +156,7 @@ namespace UserInterfaceTest.ViewModels
         public void StopDownload()
         {
             fileDownloader.CancelDownload();
-            DownloadingState = DownloadingState.Paused;
+            DownloadingState = DownloadingState.Completed;
             DownloadingProgress = 0.0;
         }
 
