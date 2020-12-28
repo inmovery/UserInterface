@@ -118,7 +118,7 @@
             CornerRadius="0"
             GlassFrameThickness="0"/>
     </WindowChrome.WindowChrome>
-
+    
     <DockPanel
         Margin="10"
         LastChildFill="True">
@@ -161,6 +161,5 @@
                 Grid.Column="2"
                 DataContext="{Binding ThirdImageDownloaderViewModel}" />
         </Grid>
-        
     </DockPanel>
 </Window>

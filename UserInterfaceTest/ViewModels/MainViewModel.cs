@@ -319,9 +319,9 @@ namespace UserInterfaceTest.ViewModels
             SecondImageDownloaderViewModel = new ImageDownloaderViewModel();
             ThirdImageDownloaderViewModel = new ImageDownloaderViewModel();
 
-            FirstImageDownloaderViewModel.PropertyChanged += ImageDownloader_PropertyChanged;
-            SecondImageDownloaderViewModel.PropertyChanged += ImageDownloader_PropertyChanged;
-            ThirdImageDownloaderViewModel.PropertyChanged += ImageDownloader_PropertyChanged;
+            FirstImageDownloaderViewModel.PropertyChanged += FirstImageDownloader_PropertyChanged;
+            SecondImageDownloaderViewModel.PropertyChanged += SecondImageDownloader_PropertyChanged;
+            ThirdImageDownloaderViewModel.PropertyChanged += ThirdImageDownloader_PropertyChanged;
 
             CountActiveDownloading = 0;
             TotalDownloadingProgress = new TotalDownloadingProgress();
@@ -342,7 +342,7 @@ namespace UserInterfaceTest.ViewModels
 
         #region PropertyChange Methods
 
-        private void ImageDownloader_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void FirstImageDownloader_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
@@ -357,6 +357,52 @@ namespace UserInterfaceTest.ViewModels
                         CountActiveDownloading++;
                     }
                     else if(((ImageDownloaderViewModel)sender).DownloadingState == DownloadingState.Completed)
+                    {
+                        CountActiveDownloading--;
+                    }
+                    RaisePropertyChanged(nameof(CountActiveDownloading));
+                    break;
+            }
+        }
+
+        private void SecondImageDownloader_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "DownloadingProgress":
+                    TotalDownloadingProgress.TotalDownloadingProgressValue = (FirstImageDownloaderViewModel.DownloadingProgress + SecondImageDownloaderViewModel.DownloadingProgress
+                            + ThirdImageDownloaderViewModel.DownloadingProgress) / (CountActiveDownloading != 0 ? CountActiveDownloading : 1);
+                    RaisePropertyChanged(nameof(TotalDownloadingProgress));
+                    break;
+                case "DownloadingState":
+                    if (((ImageDownloaderViewModel)sender).DownloadingState == DownloadingState.Downloading)
+                    {
+                        CountActiveDownloading++;
+                    }
+                    else if (((ImageDownloaderViewModel)sender).DownloadingState == DownloadingState.Completed)
+                    {
+                        CountActiveDownloading--;
+                    }
+                    RaisePropertyChanged(nameof(CountActiveDownloading));
+                    break;
+            }
+        }
+
+        private void ThirdImageDownloader_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "DownloadingProgress":
+                    TotalDownloadingProgress.TotalDownloadingProgressValue = (FirstImageDownloaderViewModel.DownloadingProgress + SecondImageDownloaderViewModel.DownloadingProgress
+                            + ThirdImageDownloaderViewModel.DownloadingProgress) / (CountActiveDownloading != 0 ? CountActiveDownloading : 1);
+                    RaisePropertyChanged(nameof(TotalDownloadingProgress));
+                    break;
+                case "DownloadingState":
+                    if (((ImageDownloaderViewModel)sender).DownloadingState == DownloadingState.Downloading)
+                    {
+                        CountActiveDownloading++;
+                    }
+                    else if (((ImageDownloaderViewModel)sender).DownloadingState == DownloadingState.Completed)
                     {
                         CountActiveDownloading--;
                     }
