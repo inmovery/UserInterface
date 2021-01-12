@@ -77,7 +77,7 @@
     <Compile Include="Converters\ProgressConverter.cs" />
     <Compile Include="Enums\DownloadingState.cs" />
     <Compile Include="Helpers\Converter.cs" />
-    <Compile Include="Helpers\WebClientHelper.cs" />
+    <Compile Include="Helpers\Utils.cs" />
     <Compile Include="Models\FileDownloader.cs" />
     <Compile Include="Models\Interfaces\IFileDownloader.cs" />
     <Compile Include="Models\TotalDownloadingProgress.cs" />

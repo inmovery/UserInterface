@@ -4,31 +4,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using UserInterfaceTest.Helpers;
 using UserInterfaceTest.Models.Interfaces;
+using UserInterfaceTest.ViewModels;
 
 namespace UserInterfaceTest.Models
 {
-    public class FileDownloader : IFileDownloader
+    public class FileDownloader : BaseViewModel, IFileDownloader
     {
         private CancellationTokenSource _cancelationTokenSource;
 
-        public async Task<byte[]> Download(string Url, Action<double> progress)
+        public async Task DownloadImage(WebClient webClient, string Url)
         {
-            try
-            {
-                _cancelationTokenSource = new CancellationTokenSource();
-                var bytes = new byte[0];
-                using (var webClient = new WebClient())
-                {
-                    bytes = await webClient.DownloadDataWithProgressAsync(Url, new Progress<double>(progress), _cancelationTokenSource.Token);
-                }
-                return bytes;
-            }
-            catch (WebException e)
-            {
-                if (!_cancelationTokenSource.IsCancellationRequested)
-                    throw;
-            }
-            return new byte[0];
+            _cancelationTokenSource = new CancellationTokenSource();
+            var imageBytes = new byte[0];
+
+            var cancellationToken = _cancelationTokenSource.Token;
+            cancellationToken.Register(() => webClient.CancelAsync());
+            webClient.DownloadDataAsync(new Uri(Url));
         }
 
         public void CancelDownload()

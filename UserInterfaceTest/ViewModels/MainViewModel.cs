@@ -1,14 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using UserInterfaceTest.Commands;
 using UserInterfaceTest.Enums;
+using UserInterfaceTest.Helpers;
 using UserInterfaceTest.Models;
+using UserInterfaceTest.Views;
 
 namespace UserInterfaceTest.ViewModels
 {
@@ -17,20 +25,16 @@ namespace UserInterfaceTest.ViewModels
 
         #region Private Members
 
-        private ImageDownloaderViewModel firstImageDownloaderViewModel;
-        private ImageDownloaderViewModel secondImageDownloaderViewModel;
-        private ImageDownloaderViewModel thirdImageDownloaderViewModel;
-
         private TotalDownloadingProgress totalDownloadingProgress;
-        private int countActiveDownloading;
-
+        private int CountImageDownloaders = 3;
+        
         private ICommand downloadAllCommand;
-
+        
         /// <summary>
         /// The Window this view model controls
         /// </summary>
         private Window windowInstance;
-
+        
         /// <summary>
         /// The margin around the window to allow for a drop shadow
         /// </summary>
@@ -45,44 +49,9 @@ namespace UserInterfaceTest.ViewModels
 
         #region Public Members [INPC]
 
-        public ImageDownloaderViewModel FirstImageDownloaderViewModel
-        {
-            get
-            {
-                return firstImageDownloaderViewModel;
-            }
-            set
-            {
-                firstImageDownloaderViewModel = value;
-                RaisePropertyChanged();
-            }
-        }
+        public ObservableCollection<ImageDownloaderViewModel> ImageDownloaders { get; set; }
 
-        public ImageDownloaderViewModel SecondImageDownloaderViewModel
-        {
-            get
-            {
-                return secondImageDownloaderViewModel;
-            }
-            set
-            {
-                secondImageDownloaderViewModel = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public ImageDownloaderViewModel ThirdImageDownloaderViewModel
-        {
-            get
-            {
-                return thirdImageDownloaderViewModel;
-            }
-            set
-            {
-                thirdImageDownloaderViewModel = value;
-                RaisePropertyChanged();
-            }
-        }
+        public ICollectionView ImageDownloadersView { get; set; }
 
         public TotalDownloadingProgress TotalDownloadingProgress
         {
@@ -97,16 +66,35 @@ namespace UserInterfaceTest.ViewModels
             }
         }
 
-        public int CountActiveDownloading
+        public long MaximumProgressBar
         {
             get
             {
-                return countActiveDownloading;
+                return (long)ImageDownloaders.Sum(x => x?.TotalBytesToReceive);
             }
-            set
+        }
+
+        private long GetTotalBytesReceive(string url)
+        {
+            try
             {
-                countActiveDownloading = value;
-                RaisePropertyChanged();
+                long result = 0;
+
+                WebRequest req = WebRequest.Create(url);
+                req.Method = "HEAD";
+                using (WebResponse resp = req.GetResponse())
+                {
+                    if (long.TryParse(resp.Headers.Get("Content-Length"), out long contentLength))
+                    {
+                        result = contentLength;
+                    }
+                }
+
+                return result;
+            }
+            catch
+            {
+                return 0;
             }
         }
 
@@ -237,10 +225,12 @@ namespace UserInterfaceTest.ViewModels
             get
             {
                 if (downloadAllCommand == null)
-                    downloadAllCommand = new AsyncRelayCommand(DownloadAllAsync,
-                        () => !(string.IsNullOrEmpty(FirstImageDownloaderViewModel.Url) ||
-                                string.IsNullOrEmpty(SecondImageDownloaderViewModel.Url) ||
-                                string.IsNullOrEmpty(ThirdImageDownloaderViewModel.Url)));
+                {
+                    bool check = false;
+                    foreach(var vm in ImageDownloaders)
+                        check = check || string.IsNullOrEmpty(vm.Url);
+                    downloadAllCommand = new AsyncRelayCommand(DownloadAllAsync, () => !check);
+                }
                 return downloadAllCommand;
             }
         }
@@ -251,35 +241,17 @@ namespace UserInterfaceTest.ViewModels
 
         public async Task DownloadAllAsync()
         {
-            CountActiveDownloading = 0;
+            ImageDownloaders.Where(x => x.TotalBytesToReceive == 0).AsParallel().ForAll(x => x.TotalBytesToReceive = GetTotalBytesReceive(x?.Url));
+            ImageDownloaders.AsParallel().ForAll(x => x.DownloadingState = DownloadingState.Downloading);
 
-            FirstImageDownloaderViewModel.DownloadingState = DownloadingState.Downloading;
-            SecondImageDownloaderViewModel.DownloadingState = DownloadingState.Downloading;
-            ThirdImageDownloaderViewModel.DownloadingState = DownloadingState.Downloading;
+            List<Task> tasks = new List<Task>();
+            foreach (var vm in ImageDownloaders)
+            {
+                tasks.Add(vm.StartDownloadAsync("All"));
+            }
+            await Task.WhenAll(tasks);
 
-            await Task.WhenAll(
-                FirstImageDownloaderViewModel.StartDownloadAsync("All"),
-                SecondImageDownloaderViewModel.StartDownloadAsync("All"),
-                ThirdImageDownloaderViewModel.StartDownloadAsync("All")
-            );
-
-            FirstImageDownloaderViewModel.DownloadingState = DownloadingState.Completed;
-            SecondImageDownloaderViewModel.DownloadingState = DownloadingState.Completed;
-            ThirdImageDownloaderViewModel.DownloadingState = DownloadingState.Completed;
-
-            CountActiveDownloading = 0;
-        }
-
-        /// <summary>
-        /// Clearing ProgressBar values
-        /// </summary>
-        public async void ApplyCompletedState()
-        {
-            CountActiveDownloading = 0;
-            FirstImageDownloaderViewModel.ClearState();
-            SecondImageDownloaderViewModel.ClearState();
-            ThirdImageDownloaderViewModel.ClearState();
-            TotalDownloadingProgress.TotalDownloadingProgressValue = -1;
+            ImageDownloaders.AsParallel().ForAll(x => x.DownloadingState = DownloadingState.Completed);
         }
 
         /// <summary>
@@ -297,7 +269,6 @@ namespace UserInterfaceTest.ViewModels
 
         public MainViewModel(Window window)
         {
-
             windowInstance = window;
 
             // Listen out for the window resizing
@@ -315,26 +286,29 @@ namespace UserInterfaceTest.ViewModels
             MaximizeCommand = new RelayCommand(() => windowInstance.WindowState ^= WindowState.Maximized);
             CloseCommand = new RelayCommand(CloseWindow);
 
-            FirstImageDownloaderViewModel = new ImageDownloaderViewModel();
-            SecondImageDownloaderViewModel = new ImageDownloaderViewModel();
-            ThirdImageDownloaderViewModel = new ImageDownloaderViewModel();
+            List<ImageDownloaderViewModel> cotrols = new List<ImageDownloaderViewModel>();
+            for (int i = 0; i < CountImageDownloaders; i++)
+            {
+                ImageDownloaderViewModel vm = new ImageDownloaderViewModel();
+                vm.PropertyChanged += ImageDownloaders_PropertyChanged;
+                cotrols.Add(vm);
+            }
 
-            FirstImageDownloaderViewModel.PropertyChanged += FirstImageDownloader_PropertyChanged;
-            SecondImageDownloaderViewModel.PropertyChanged += SecondImageDownloader_PropertyChanged;
-            ThirdImageDownloaderViewModel.PropertyChanged += ThirdImageDownloader_PropertyChanged;
+            ImageDownloaders = new ObservableCollection<ImageDownloaderViewModel>(cotrols);
+            BindingOperations.EnableCollectionSynchronization(ImageDownloaders, new object());
+            ImageDownloadersView = CollectionViewSource.GetDefaultView(ImageDownloaders);
 
-            CountActiveDownloading = 0;
             TotalDownloadingProgress = new TotalDownloadingProgress();
             TotalDownloadingProgress.PropertyChanged += TotalDownloadingProgress_PropertyChanged;
         }
 
-        public MainViewModel(ImageDownloaderViewModel first, ImageDownloaderViewModel second, ImageDownloaderViewModel third)
+        public MainViewModel(params ImageDownloaderViewModel[] models)
         {
-            FirstImageDownloaderViewModel = first;
-            SecondImageDownloaderViewModel = second;
-            ThirdImageDownloaderViewModel = third;
+            for(int i = 0; i < models.Length; i++)
+            {
+                ImageDownloaders[i] = models[i];
+            }
 
-            CountActiveDownloading = 0;
             TotalDownloadingProgress = new TotalDownloadingProgress();
         }
 
@@ -342,71 +316,14 @@ namespace UserInterfaceTest.ViewModels
 
         #region PropertyChange Methods
 
-        private void FirstImageDownloader_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void ImageDownloaders_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
                 case "DownloadingProgress":
-                    TotalDownloadingProgress.TotalDownloadingProgressValue = (FirstImageDownloaderViewModel.DownloadingProgress + SecondImageDownloaderViewModel.DownloadingProgress
-                            + ThirdImageDownloaderViewModel.DownloadingProgress) / (CountActiveDownloading != 0 ? CountActiveDownloading : 1);
+                    long scale = MaximumProgressBar == 0 ? 1 : (MaximumProgressBar / 100);
+                    TotalDownloadingProgress.TotalDownloadingProgressValue = ImageDownloaders.Sum(x => x.CurrentBytesReceived) / scale;
                     RaisePropertyChanged(nameof(TotalDownloadingProgress));
-                    break;
-                case "DownloadingState":
-                    if(((ImageDownloaderViewModel)sender).DownloadingState == DownloadingState.Downloading)
-                    {
-                        CountActiveDownloading++;
-                    }
-                    else if(((ImageDownloaderViewModel)sender).DownloadingState == DownloadingState.Completed)
-                    {
-                        CountActiveDownloading--;
-                    }
-                    RaisePropertyChanged(nameof(CountActiveDownloading));
-                    break;
-            }
-        }
-
-        private void SecondImageDownloader_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case "DownloadingProgress":
-                    TotalDownloadingProgress.TotalDownloadingProgressValue = (FirstImageDownloaderViewModel.DownloadingProgress + SecondImageDownloaderViewModel.DownloadingProgress
-                            + ThirdImageDownloaderViewModel.DownloadingProgress) / (CountActiveDownloading != 0 ? CountActiveDownloading : 1);
-                    RaisePropertyChanged(nameof(TotalDownloadingProgress));
-                    break;
-                case "DownloadingState":
-                    if (((ImageDownloaderViewModel)sender).DownloadingState == DownloadingState.Downloading)
-                    {
-                        CountActiveDownloading++;
-                    }
-                    else if (((ImageDownloaderViewModel)sender).DownloadingState == DownloadingState.Completed)
-                    {
-                        CountActiveDownloading--;
-                    }
-                    RaisePropertyChanged(nameof(CountActiveDownloading));
-                    break;
-            }
-        }
-
-        private void ThirdImageDownloader_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case "DownloadingProgress":
-                    TotalDownloadingProgress.TotalDownloadingProgressValue = (FirstImageDownloaderViewModel.DownloadingProgress + SecondImageDownloaderViewModel.DownloadingProgress
-                            + ThirdImageDownloaderViewModel.DownloadingProgress) / (CountActiveDownloading != 0 ? CountActiveDownloading : 1);
-                    RaisePropertyChanged(nameof(TotalDownloadingProgress));
-                    break;
-                case "DownloadingState":
-                    if (((ImageDownloaderViewModel)sender).DownloadingState == DownloadingState.Downloading)
-                    {
-                        CountActiveDownloading++;
-                    }
-                    else if (((ImageDownloaderViewModel)sender).DownloadingState == DownloadingState.Completed)
-                    {
-                        CountActiveDownloading--;
-                    }
-                    RaisePropertyChanged(nameof(CountActiveDownloading));
                     break;
             }
         }
@@ -415,9 +332,9 @@ namespace UserInterfaceTest.ViewModels
         {
             if (e.PropertyName == "TotalDownloadingProgressValue")
             {
-                if (Math.Abs(((TotalDownloadingProgress)sender).TotalDownloadingProgressValue - 100.0) < 0.1)
+                if (((TotalDownloadingProgress)sender).TotalDownloadingProgressValue == MaximumProgressBar)
                 {
-                    await Task.Run(ApplyCompletedState);
+                    TotalDownloadingProgress.TotalDownloadingProgressValue = -1;
                 }
             }
         }

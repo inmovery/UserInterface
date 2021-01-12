@@ -9,7 +9,7 @@
     d:DesignHeight="300"
     d:DesignWidth="300"
     mc:Ignorable="d">
-
+    
     <DockPanel LastChildFill="True">
         <StackPanel DockPanel.Dock="Bottom">
             <TextBox
@@ -31,11 +31,27 @@
                 Content="Стоп"
                 Background="#d1284c"
                 Style="{StaticResource RegularButton}"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock
+                    Text="{Binding TotalBytesToReceive, FallbackValue=0}"
+                    FontSize="16"
+                    Foreground="Black"/>
+                <TextBlock
+                    Text=" / "
+                    FontSize="16"
+                    Foreground="Black"/>
+                <TextBlock
+                    Text="{Binding CurrentBytesReceived, FallbackValue=0}"
+                    HorizontalAlignment="Center"
+                    FontSize="16"
+                    Foreground="Black"/>
+            </StackPanel>
         </StackPanel>
 
         <Border
-            MinWidth="300"
-            MinHeight="150"
+            MinWidth="150"
+            MinHeight="100"
             Margin="5"
             CornerRadius="3"
             BorderThickness="3">
@@ -64,7 +80,7 @@
                     Content="{StaticResource IconFileUpload}"
                     Width="48"
                     Height="74" />-->
-                <Image Source="{Binding SourceImage}" />
+                <Image Source="{Binding SourceImage, FallbackValue={StaticResource IconFileUpload}}" />
             </StackPanel>
         </Border>
 

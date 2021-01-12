@@ -129,7 +129,8 @@
                 Margin="5"
                 Style="{StaticResource RegularButton}"/>
             <ProgressBar
-                Value="{Binding TotalDownloadingProgress.TotalDownloadingProgressValue, Mode=OneWay}"
+                x:Name="ProgressBarView"
+                Value="{Binding TotalDownloadingProgress.TotalDownloadingProgressValue, Mode=OneWay, FallbackValue=0}"
                 Height="30"
                 Margin="5"
                 Foreground="{StaticResource GeneralBrush}"
@@ -146,7 +147,7 @@
             </StackPanel>
         </StackPanel>
         <Grid>
-            <Grid.ColumnDefinitions>
+            <!--<Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition />
@@ -159,7 +160,65 @@
                 DataContext="{Binding SecondImageDownloaderViewModel}" />
             <local:ImageDownloaderView
                 Grid.Column="2"
-                DataContext="{Binding ThirdImageDownloaderViewModel}" />
+                DataContext="{Binding ThirdImageDownloaderViewModel}" />-->
+            <ListBox
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                HorizontalContentAlignment="Stretch"
+                VerticalContentAlignment="Stretch"
+                BorderThickness="0"
+                Background="Transparent"
+                ItemsSource="{Binding ImageDownloadersView}">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Rows="1" Columns="{Binding ImageDownloaders.Count}"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <local:ImageDownloaderView DataContext="{Binding}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="BorderBrush" Value="Transparent"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <Grid x:Name="Grid">
+                                        <Border
+                                            x:Name="SimpleBackground"
+                                            Visibility="Visible"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            Background="{TemplateBinding Background}"
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch"/>
+                                        <Border
+                                            x:Name="OnSelectedBackground"
+                                            Visibility="Collapsed"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            Background="Transparent"
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch"/>
+                                        <ContentPresenter x:Name="ContentPresenter"/>
+                                    </Grid>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="OnSelectedBackground" Property="Visibility" Value="Visible"></Setter>
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="False">
+                                            <Setter TargetName="OnSelectedBackground" Property="Visibility" Value="Collapsed"></Setter>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>
         </Grid>
     </DockPanel>
 </Window>
