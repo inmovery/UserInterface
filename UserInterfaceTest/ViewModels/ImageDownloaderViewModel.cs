@@ -195,8 +195,6 @@ namespace UserInterfaceTest.ViewModels
 
             TotalBytesToReceive = GetTotalBytesReceive(Url);
 
-            MessageBox.Show("test");
-
             try
             {
                 if (setting != "All")
