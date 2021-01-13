@@ -321,7 +321,8 @@ namespace UserInterfaceTest.ViewModels
             switch (e.PropertyName)
             {
                 case "DownloadingProgress":
-                    long scale = MaximumProgressBar == 0 ? 1 : (MaximumProgressBar / 100);
+                    //long pre_calc_max = MaximumProgressBar == -1 ? 1 : MaximumProgressBar;
+                    double scale = MaximumProgressBar == 0 ? 1 : (MaximumProgressBar / 100);
                     TotalDownloadingProgress.TotalDownloadingProgressValue = ImageDownloaders.Sum(x => x.CurrentBytesReceived) / scale;
                     RaisePropertyChanged(nameof(TotalDownloadingProgress));
                     break;
@@ -332,10 +333,10 @@ namespace UserInterfaceTest.ViewModels
         {
             if (e.PropertyName == "TotalDownloadingProgressValue")
             {
-                if (((TotalDownloadingProgress)sender).TotalDownloadingProgressValue == MaximumProgressBar)
-                {
-                    TotalDownloadingProgress.TotalDownloadingProgressValue = -1;
-                }
+                //if (((TotalDownloadingProgress)sender).TotalDownloadingProgressValue == MaximumProgressBar)
+                //{
+                //    TotalDownloadingProgress.TotalDownloadingProgressValue = -1;
+                //}
             }
         }
 
