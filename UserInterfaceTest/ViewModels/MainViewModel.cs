@@ -229,7 +229,7 @@ namespace UserInterfaceTest.ViewModels
                     bool check = false;
                     foreach(var vm in ImageDownloaders)
                         check = check || string.IsNullOrEmpty(vm.Url);
-                    downloadAllCommand = new AsyncRelayCommand(DownloadAllAsync, () => !check);
+                    downloadAllCommand = new AsyncRelayCommand(DownloadAllAsync, () => check);
                 }
                 return downloadAllCommand;
             }
